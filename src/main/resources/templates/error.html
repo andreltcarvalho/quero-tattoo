@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments :: head"/>
+</head>
+<body th:with="httpStatus=${T(org.springframework.http.HttpStatus).valueOf(#response.status)}">
+<main>
+    <header th:insert=" fragments :: header"></header>
+    <div class="sobre">
+        <h1>Erro!</h1>
+        <br>
+        <h2><a href="/home">Clique aqui para voltar à Pagina Inicial</a></h2>
+        <h3 th:text="|${httpStatus} - ${httpStatus.reasonPhrase}|"></h3>
+        <h3 th:text="${errorMessage}"></h3>
+        <h3 th:text="${errorDetails}"></h3>
+
+    </div>
+    <br>
+    <br>
+    <br>
+</main>
+<footer th:insert="fragments :: footer"></footer>
+</body>
+</html>

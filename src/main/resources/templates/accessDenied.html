@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments :: head"/>
+<body>
+<header th:replace="fragments :: header"></header>
+<main>
+    <div>
+        <h1>Você não está autorizado para acessar este módulo.</h1>
+        <h2><a href="/home">Clique aqui e volte para a página inicial.</a></h2>
+    </div>
+    <footer th:replace="fragments :: footer"></footer>
+</main>
+</body>
+</html>

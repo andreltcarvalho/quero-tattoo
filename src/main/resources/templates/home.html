@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments :: head"/>
+<body>
+<main>
+    <div class="heading">
+        <div class="landing-form">
+            <div class="landing-body">
+                <h1 class="head">Chega de rodar o Instagram atrás de um tatuador.</h1>
+                <h4>Cadastre-se <strong>agora</strong> e faça um orçamento sem compromisso com um de nossos
+                    profissionais. É rápido, e gratuito!
+                </h4>
+                <button class="cta">Experimente</button>
+            </div>
+        </div>
+    </div>
+    <div class="benefits">
+        <div class="benefit-box">
+            <h3>Encontre tatuadores perto de você</h3>
+        </div>
+        <div class="benefit-box"> 
+            <h3>Agende rapidamente</h3>
+        </div>
+        <div class="benefit-box">
+            <h3>Obtenha os melhores preços</h3>
+        </div>
+    </div>
+    <div class="cookie-banner" th:if="${showDialog==true}">
+        <p>
+            Utilizamos cookies para fornecer uma melhor experiência para nossos usuários. Para saber mais sobre
+            o uso de cookies, consulte nossa <a href="/privacy">política de privacidade</a>. Ao continuar navegando em
+            nosso site, você concorda com a nossa política.
+        <form method="POST" th:action="@{/ip}">
+            <button class="btn btn-ligth" type="submit">Aceitar</button>
+        </form>
+    </div>
+</main>
+<footer th:replace="fragments :: footer"></footer>
+<div th:include="fragments :: modals"></div>
+</body>
+</html>

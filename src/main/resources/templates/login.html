@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments :: head"/>
+<body>
+<header th:insert="fragments :: header"></header>
+<main>
+    <div class="login-form col-sm-4">
+        <div class="card">
+            <article class="card-body">
+                <h4 class="card-title text-center mb-4 mt-1">Entrar</h4>
+                <hr>
+                <p class="text-success text-center">Faça login para poder solicitar orçamentos!</p>
+                <form method="post" name="f" th:action="@{/login}">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                            </div>
+                            <input class="form-control" id="username" name="username"
+                                   placeholder="Entre com o seu e-mail de cadastro"
+                                   required type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                            </div>
+                            <input class="form-control" id="passwordId" name="password"
+                                   placeholder="Insira sua senha aqui"
+                                   required type="password">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-dark btn-block" type="submit"> Entrar</button>
+                    </div>
+                    <div th:if="${param.error}">
+                        <h2 class="message">E-mail ou senha inválidos. Tente novamente</h2>
+                    </div>
+                    <p class="text-center"><a class="btn" href="/forgotPassword">Esqueci minha senha</a></p>
+                    <p class="text-center">Não tem uma conta?<a class="btn" href="/register"> Cadastre-se aqui!</a>
+                    </p>
+                </form>
+            </article>
+        </div>
+    </div>
+</main>
+<footer th:insert="fragments :: footer"></footer>
+<div th:include="fragments :: modals"></div>
+</body>
+</html>
