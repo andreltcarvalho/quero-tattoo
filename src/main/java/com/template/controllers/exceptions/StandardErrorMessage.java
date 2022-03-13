@@ -1,31 +1,26 @@
 package com.template.controllers.exceptions;
 
 import java.io.Serializable;
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 
-public class StandardError extends Throwable implements Serializable {
+public class StandardErrorMessage implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Instant timestamp;
-    private Integer status;
-    private String error;
+    private String title;
     private String message;
     private String path;
 
-    private StandardError() {
+    private StandardErrorMessage() {
 
     }
 
-    public StandardError(Integer status, String error, String message, String path) {
+    public StandardErrorMessage(String title, String message, String path) {
         super();
         this.timestamp = Instant.now().minus(3, ChronoUnit.HOURS);
-        this.status = status;
-        this.error = error;
+
+        this.title = title;
         this.message = message;
         this.path = path;
     }
@@ -38,20 +33,12 @@ public class StandardError extends Throwable implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getTitle() {
+        return title;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getMessage() {

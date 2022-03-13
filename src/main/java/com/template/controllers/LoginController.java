@@ -35,38 +35,30 @@ public class LoginController {
         return login;
     }
 
-    @GetMapping("/forgotPassword")
-    public ModelAndView forgotPassword() {
-        return new ModelAndView("forgotPassword");
-    }
 
     @PostMapping("/forgotPassword")
-    public ModelAndView changePassword(@RequestParam String email) {
+    public void changePassword(@RequestParam String email) {
         UserEntity user = userEntityService.findByEmail(email);
         if (user != null && user.isEnabled() == true) {
             mailService.sendNewPasswordEmail(user);
-            return new ModelAndView("forgotPassword").addObject("messages", "E-mail sent sucessfully!");
+            //200 ok
         } else {
-            return new ModelAndView("forgotPassword").addObject("errors","Invalid e-mail or nonexistent account!");
+            //500 erro
         }
     }
 
-    @GetMapping("/newPassword")
-    public ModelAndView getNewPassword(@RequestParam String verificationCode) {
-        return new ModelAndView("newPassword").addObject("verificationCode", verificationCode);
-    }
 
     @PostMapping("/newPassword")
-    public ModelAndView postNewPassword(@RequestParam String verificationCode, @RequestParam String password) {
+    public void postNewPassword(@RequestParam String verificationCode, @RequestParam String password) {
         UserEntity user = userEntityService.findByVerificationCode(verificationCode);
         if (user != null && user.isEnabled() == true) {
             user.setPassword(new BCryptPasswordEncoder().encode(password));
             user.setVerificationCode(null);
             userEntityService.update(user);
             logger.info("User " + user.getEmail() + " changed password");
-            return new ModelAndView("newPassword").addObject("messages", "Password Successfully updated!! Return to the log in page");
+            //200 ok
         } else {
-            return new ModelAndView("newPassword").addObject("errors", "Error while updating password!");
+            //400 erro
         }
     }
 }

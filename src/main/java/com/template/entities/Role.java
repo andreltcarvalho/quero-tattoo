@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 @Entity
@@ -19,6 +20,7 @@ public class Role implements GrantedAuthority {
     @Column(unique = true)
     private String nomeRole;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private List<UserEntity> users;
 

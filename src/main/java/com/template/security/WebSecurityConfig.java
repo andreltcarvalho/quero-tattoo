@@ -45,17 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/profile/**")
                 .authenticated()
                 .antMatchers(HttpMethod.GET, "/admin/**")
-                .hasRole("ADMIN")
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/home", true)
-                .permitAll()
-                .and()
-                .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+                .hasRole("ADMIN");
 
-        http.exceptionHandling().accessDeniedPage("/accessDenied");
+
     }
 
     @Override

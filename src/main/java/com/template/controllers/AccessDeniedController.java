@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AccessDeniedController {
-    private static Logger logger = LoggerFactory.getLogger(AccessDeniedController.class);
 
+    private static Logger logger = LoggerFactory.getLogger(AccessDeniedController.class);
     @GetMapping("/accessDenied")
     public String viewHomePage() {
         logger.info("Acesso negado para o endpoint Admin!");

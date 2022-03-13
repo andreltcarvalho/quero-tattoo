@@ -47,9 +47,8 @@ public class UserEntityService {
         String randomCode = RandomString.make(64);
         userForm.setVerificationCode(randomCode);
         userForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_USER")));
-        UserEntity user = userEntityDAO.save(userForm);
-        logger.info("Novo usuario cadastrado: " + user.toString());
-        return user;
+        logger.info("Novo usuario cadastrado: " + userForm.toString());
+        return userEntityDAO.save(userForm);
     }
 
     public UserEntity update(UserEntity userForm) {

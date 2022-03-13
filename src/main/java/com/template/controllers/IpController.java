@@ -16,21 +16,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class HomeController {
+public class IpController {
 
     @Autowired
     IpService ipService;
-    private static Logger logger = LoggerFactory.getLogger(HomeController.class);
-
-    @GetMapping({"/", "/home"})
-    public ModelAndView start() {
-        ModelAndView home = new ModelAndView("home").addObject("showDialog", false);
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        if (ipService.findByIp(request.getRemoteAddr()) == null) {
-            home.addObject("showDialog", true);
-        }
-        return home;
-    }
+    private static Logger logger = LoggerFactory.getLogger(IpController.class);
 
     @ResponseBody
     @GetMapping("/loaderio-6588074480623f33d655dc4bc3445277")
@@ -39,10 +29,10 @@ public class HomeController {
     }
 
     @PostMapping("/ip")
-    public ModelAndView getIp() {
+    public void getIp() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest();
         ipService.insert(new IpAdress(null, request.getRemoteAddr()));
-        return new ModelAndView("redirect:/home");
+        //200ok
     }
 }
