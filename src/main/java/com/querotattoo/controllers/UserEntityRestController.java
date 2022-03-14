@@ -95,11 +95,8 @@ public class UserEntityRestController {
     }
 
     @GetMapping("/verify")
-    public void verifyUser(@Param("code") String code) {
-        if (userService.verify(code)) {
-            //retorna 200
-        } else {
-            //ai depende 500 ou 400
-        }
+    public ResponseEntity<String> verifyUser(@Param("code") String code) {
+        return userService.verify(code) ? ResponseEntity.ok().body("Usuário verificado com Sucesso!")
+                : ResponseEntity.status(500).body("Erro na verificação do usuário");
     }
 }

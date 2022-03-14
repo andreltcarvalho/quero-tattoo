@@ -52,7 +52,7 @@ public class SenderMailService {
         helper.setTo(toAddress);
         helper.setSubject(subject);
         content = content.replace("[[name]]", user.getName());
-        String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
+        String verifyURL = siteURL + "/users/verify?code=" + user.getVerificationCode();
         content = content.replace("[[URL]]", verifyURL);
         helper.setText(content, true);
         if (profile.equals("prod")) {
@@ -82,7 +82,7 @@ public class SenderMailService {
             helper.setSubject(subject);
             content = content.replace("[[name]]", user.getName());
             user.setVerificationCode(randomCode);
-            String verifyURL = siteURL + "/newPassword?verificationCode=" + user.getVerificationCode();
+            String verifyURL = siteURL + "/users/newPassword?verificationCode=" + user.getVerificationCode();
             content = content.replace("[[URL]]", verifyURL);
             helper.setText(content, true);
             userService.update(user);
