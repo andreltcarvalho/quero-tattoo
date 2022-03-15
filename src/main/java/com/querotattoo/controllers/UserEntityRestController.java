@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
@@ -81,7 +82,7 @@ public class UserEntityRestController {
 
     @ResponseBody
     @PostMapping("/artists")
-    public ResponseEntity<User> artistRegistration(@RequestBody Artist userForm) throws MessagingException, UnsupportedEncodingException, StandardError {
+    public ResponseEntity<User> artistRegistration(@RequestBody @Valid Artist userForm) throws MessagingException, UnsupportedEncodingException, StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userForm.getId()).toUri();
         if (userService.findByEmail(userForm.getEmail()) != null) {
             throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail", uri.getPath());

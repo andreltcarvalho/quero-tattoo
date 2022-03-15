@@ -103,7 +103,7 @@ public class UserEntityService {
 
 //	public Usuario update(Long id, Usuario obj) {
 //		try {
-//			Cidade entity = usuarioDAO.getOne(id);
+//			City entity = usuarioDAO.getOne(id);
 //			return usuarioDAO.save(entity);
 //		} catch (EntityNotFoundException e) {
 //			throw new ResourceNotFoundException(id);

@@ -3,8 +3,11 @@ package com.querotattoo.entities;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,11 +16,18 @@ import java.util.List;
 public class Artist extends User implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
 
+    @NotNull
+    @NotEmpty
     @ElementCollection
     private List<String> tattooStyles;
 
+    @NotNull
+    @NotEmpty
     @ElementCollection
     private List<String> workingCities;
+
+    @Embedded
+    private StudioAddress studioAddress;
 
     public Artist(Long id, String nome, String email, String password, String phone,
                   List<Role> roles, String userType, List<String> tattooStyles, List<String> workingCities) {

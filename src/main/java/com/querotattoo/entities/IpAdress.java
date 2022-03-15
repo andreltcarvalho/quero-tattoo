@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "enderecos")
+@Table(name = "ip_adresses")
 public class IpAdress implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -5,6 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -20,18 +22,24 @@ public class User implements Serializable, UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private String password;
 
+    @NotNull
     @Column(name = "phone", unique = true)
     private String phone;
+
 
     private boolean enabled;
 
     @Column(name = "verification_code", length = 64)
     private String verificationCode;
 
+    @NotNull
+    @Email
     @Column(name = "email", unique = true)
     private String email;
 

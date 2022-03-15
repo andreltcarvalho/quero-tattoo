@@ -31,7 +31,7 @@ public class ProdConfig implements CommandLineRunner {
             roleService.SaveAll(Arrays.asList(r1, r2));
         }
 
-        final User u3 = new User(null, "admin", "admin",
+        final User u3 = new User(null, "admin", "admin@querotattoo.com",
                 new BCryptPasswordEncoder().encode("admin"), "35992258023", Arrays.asList(r1));
         u3.setEnabled(true);
 
