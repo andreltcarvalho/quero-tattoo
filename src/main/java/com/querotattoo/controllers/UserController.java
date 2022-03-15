@@ -23,9 +23,9 @@ import java.util.List;
 
 @RestController()
 @RequestMapping(value = "/users")
-public class UserEntityRestController {
+public class UserController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserEntityRestController.class);
+    private static Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserEntityService userService;

@@ -1,6 +1,7 @@
 package com.querotattoo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,11 +11,11 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @Inheritance
 @Entity
 @Table(name = "users")
+@Data
 public class User implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -49,88 +50,19 @@ public class User implements Serializable, UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "nomeRole"))
     private List<Role> roles;
 
-    public User() {
+    public User(){
 
-    }
+    };
 
-    public User(Long id, String nome, String email, String password, String phone, List<Role> roles) {
+    public User(Long id, String name, String email,String password, String phone, String verificationCode,  List<Role> roles) {
         this.id = id;
-        this.name = nome;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.roles = roles;
-        this.enabled = false;
-
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getVerificationCode() {
-        return verificationCode;
-    }
-
-    public void setVerificationCode(String verificationCode) {
-        this.verificationCode = verificationCode;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User that = (User) o;
-        return isEnabled() == that.isEnabled() && getId().equals(that.getId())
-                && getName().equals(that.getName()) && getPassword().equals(that.getPassword())
-                && getPhone().equals(that.getPhone()) && getVerificationCode().equals(that.getVerificationCode())
-                && getEmail().equals(that.getEmail())
-                && getRoles().equals(that.getRoles());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getPassword(), getPhone(), isEnabled(), getVerificationCode(), getEmail(), getRoles());
+        this.enabled = false;
+        this.verificationCode = verificationCode;
+        this.email = email;
+        this.roles = roles;
     }
 
     @Override
@@ -170,19 +102,5 @@ public class User implements Serializable, UserDetails {
     @Override
     public boolean isEnabled() {
         return this.enabled;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", phone='" + phone + '\'' +
-                ", enabled=" + enabled +
-                ", verificationCode='" + verificationCode + '\'' +
-                ", email='" + email + '\'' +
-                ", roles=" + roles +
-                '}';
     }
 }

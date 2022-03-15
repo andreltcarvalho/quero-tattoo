@@ -32,7 +32,7 @@ public class ProdConfig implements CommandLineRunner {
         }
 
         final User u3 = new User(null, "admin", "admin@querotattoo.com",
-                new BCryptPasswordEncoder().encode("admin"), "35992258023", Arrays.asList(r1));
+                new BCryptPasswordEncoder().encode("admin"), "35992258023", null, Arrays.asList(r1));
         u3.setEnabled(true);
 
         if (userEntityService.findByEmail(u3.getEmail()) == null) {
