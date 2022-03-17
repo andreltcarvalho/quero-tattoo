@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserEntityService {
+public class UserService {
 
-    private static Logger logger = LoggerFactory.getLogger(UserEntityService.class);
+    private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserDAO userDAO;
@@ -34,8 +34,11 @@ public class UserEntityService {
     }
 
     public User findById(Long id) {
+        if(id==null){
+            throw new IllegalStateException("O id do usuario não pode ser nulo.");
+        }
         Optional<User> object = userDAO.findById(id);
-        return object.orElseThrow(() -> new ResourceNotFoundException(id));
+        return object.orElseThrow(() -> new ResourceNotFoundException("Usuario nao encontrado com id: "+id));
     }
 
     public List<User> saveAll(List<User> users) {

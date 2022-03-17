@@ -3,7 +3,7 @@ package com.querotattoo.config;
 import com.querotattoo.entities.Role;
 import com.querotattoo.entities.User;
 import com.querotattoo.services.RoleService;
-import com.querotattoo.services.UserEntityService;
+import com.querotattoo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ public class ProdConfig implements CommandLineRunner {
     private RoleService roleService;
 
     @Autowired
-    private UserEntityService userEntityService;
+    private UserService userService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -35,8 +35,8 @@ public class ProdConfig implements CommandLineRunner {
                 new BCryptPasswordEncoder().encode("admin"), "35992258023", null, Arrays.asList(r1));
         u3.setEnabled(true);
 
-        if (userEntityService.findByEmail(u3.getEmail()) == null) {
-            userEntityService.saveAll(Arrays.asList(u3));
+        if (userService.findByEmail(u3.getEmail()) == null) {
+            userService.saveAll(Arrays.asList(u3));
         }
     }
 }

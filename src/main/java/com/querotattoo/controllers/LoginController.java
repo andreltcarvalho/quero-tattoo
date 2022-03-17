@@ -2,7 +2,7 @@ package com.querotattoo.controllers;
 
 import com.querotattoo.entities.User;
 import com.querotattoo.services.SenderMailService;
-import com.querotattoo.services.UserEntityService;
+import com.querotattoo.services.UserService;
 import com.querotattoo.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class LoginController {
     private static Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
-    UserEntityService userEntityService;
+    UserService userService;
 
     @Autowired
     private SenderMailService mailService;
@@ -38,7 +38,7 @@ public class LoginController {
 
     @PostMapping("/forgotPassword")
     public void changePassword(@RequestParam String email) {
-        User user = userEntityService.findByEmail(email);
+        User user = userService.findByEmail(email);
         if (user != null && user.isEnabled() == true) {
             mailService.sendNewPasswordEmail(user);
             //200 ok
@@ -50,11 +50,11 @@ public class LoginController {
 
     @PostMapping("/newPassword")
     public void postNewPassword(@RequestParam String verificationCode, @RequestParam String password) {
-        User user = userEntityService.findByVerificationCode(verificationCode);
+        User user = userService.findByVerificationCode(verificationCode);
         if (user != null && user.isEnabled() == true) {
             user.setPassword(new BCryptPasswordEncoder().encode(password));
             user.setVerificationCode(null);
-            userEntityService.update(user);
+            userService.update(user);
             logger.info("User " + user.getEmail() + " changed password");
             //200 ok
         } else {

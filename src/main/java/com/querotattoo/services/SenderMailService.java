@@ -25,7 +25,7 @@ public class SenderMailService {
     private JavaMailSenderImpl mailSender;
 
     @Autowired
-    private UserEntityService userService;
+    private UserService userService;
 
     @Value("${site.url}")
     private String siteURL;

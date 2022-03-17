@@ -16,13 +16,12 @@ public class StandardError extends Throwable implements Serializable {
 
     }
 
-    public StandardError(Integer status, String error, String message, String path) {
+    public StandardError(Integer status, String error, String message) {
         super();
         this.timestamp = Instant.now().minus(3, ChronoUnit.HOURS);
         this.status = status;
         this.error = error;
         this.message = message;
-        this.path = path;
     }
 
     public Instant getTimestamp() {
@@ -55,14 +54,6 @@ public class StandardError extends Throwable implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
     public static long getSerialversionuid() {

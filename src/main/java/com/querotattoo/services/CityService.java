@@ -27,8 +27,11 @@ public class CityService {
     }
 
     public City findById(Long id) {
+        if(id==null){
+            throw new IllegalStateException("O id da cidade não pode ser nulo.");
+        }
         Optional<City> object = cityDAO.findById(id);
-        return object.orElseThrow(() -> new ResourceNotFoundException(id));
+        return object.orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com id:" + id));
     }
 
     public void SaveAll(List<City> roles) {

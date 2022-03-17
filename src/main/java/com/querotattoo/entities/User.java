@@ -14,7 +14,7 @@ import java.util.List;
 
 @Inheritance
 @Entity
-@Table(name = "users")
+@Table(name = "tb_users")
 @Data
 public class User implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
@@ -30,7 +30,7 @@ public class User implements Serializable, UserDetails {
     private String password;
 
     @NotNull
-    @Column(name = "phone", unique = true)
+        @Column(name = "phone", unique = true)
     private String phone;
 
 
@@ -52,7 +52,7 @@ public class User implements Serializable, UserDetails {
 
     public User(){
 
-    };
+    }
 
     public User(Long id, String name, String email,String password, String phone, String verificationCode,  List<Role> roles) {
         this.id = id;

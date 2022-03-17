@@ -3,8 +3,9 @@ package com.querotattoo.controllers;
 import com.querotattoo.controllers.exceptions.StandardError;
 import com.querotattoo.entities.Artist;
 import com.querotattoo.entities.User;
+import com.querotattoo.services.CityService;
 import com.querotattoo.services.SenderMailService;
-import com.querotattoo.services.UserEntityService;
+import com.querotattoo.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,12 +25,16 @@ import java.util.List;
 
 @RestController()
 @RequestMapping(value = "/users")
+@Validated
 public class UserController {
 
     private static Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    private UserEntityService userService;
+    private UserService userService;
+
+    @Autowired
+    private CityService cityService;
 
     @Autowired
     private SenderMailService mailSender;
@@ -70,10 +76,10 @@ public class UserController {
     public ResponseEntity<User> registration(@RequestBody User userForm) throws MessagingException, UnsupportedEncodingException, StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userForm.getId()).toUri();
         if (userService.findByEmail(userForm.getEmail()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail", uri.getPath());
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail");
         }
         if (userService.findByTelefone(userForm.getPhone()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone", uri.getPath());
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
         }
         User user = userService.create(userForm);
         mailSender.sendVerificationEmail(user);
@@ -82,16 +88,17 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/artists")
-    public ResponseEntity<User> artistRegistration(@RequestBody @Valid Artist userForm) throws MessagingException, UnsupportedEncodingException, StandardError {
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userForm.getId()).toUri();
-        if (userService.findByEmail(userForm.getEmail()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail", uri.getPath());
+    public ResponseEntity<User> artistRegistration(@RequestBody @Valid Artist artistForm) throws MessagingException, UnsupportedEncodingException, StandardError {
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(artistForm.getId()).toUri();
+        if (userService.findByEmail(artistForm.getEmail()) != null) {
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail");
         }
-        if (userService.findByTelefone(userForm.getPhone()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone", uri.getPath());
+        if (userService.findByTelefone(artistForm.getPhone()) != null) {
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
         }
-        Artist artist = (Artist) userService.create(userForm);
-        mailSender.sendVerificationEmail(userForm);
+        artistForm.getAddresses().forEach(studioAddress -> studioAddress.setCity(cityService.findById(studioAddress.getCity().getId())));
+        Artist artist = (Artist) userService.create(artistForm);
+        mailSender.sendVerificationEmail(artistForm);
         return ResponseEntity.created(uri).body(artist);
     }
 

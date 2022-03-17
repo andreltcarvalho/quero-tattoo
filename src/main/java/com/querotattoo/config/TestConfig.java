@@ -1,9 +1,13 @@
 package com.querotattoo.config;
 
+import com.querotattoo.entities.City;
 import com.querotattoo.entities.Role;
+import com.querotattoo.entities.State;
 import com.querotattoo.entities.User;
+import com.querotattoo.services.CityService;
 import com.querotattoo.services.RoleService;
-import com.querotattoo.services.UserEntityService;
+import com.querotattoo.services.StateService;
+import com.querotattoo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +24,13 @@ public class TestConfig implements CommandLineRunner {
     private RoleService roleService;
 
     @Autowired
-    private UserEntityService userEntityService;
+    private UserService userService;
+
+    @Autowired
+    private StateService stateService;
+
+    @Autowired
+    CityService cityService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -32,12 +42,23 @@ public class TestConfig implements CommandLineRunner {
             roleService.SaveAll(Arrays.asList(r1, r2));
         }
 
+        State state1 = new State(null, "São Paulo", null);
+        State state2 = new State(null, "Minas Gerais", null);
+
+        stateService.SaveAll(Arrays.asList(state1, state2));
+
+        City city1 = new City(null, "Campinas", state1);
+        City city2 = new City(null, "Belo Horizonte", state2);
+
+        cityService.SaveAll(Arrays.asList(city1,city2));
+
+
         final User u3 = new User(null, "admin", "admin@querotattoo.com",
                 new BCryptPasswordEncoder().encode("admin"), "35992258023", null, Arrays.asList(r1));
         u3.setEnabled(true);
 
-        if (userEntityService.findByEmail(u3.getEmail()) == null) {
-            userEntityService.saveAll(Arrays.asList(u3));
+        if (userService.findByEmail(u3.getEmail()) == null) {
+            userService.saveAll(Arrays.asList(u3));
         }
     }
 }

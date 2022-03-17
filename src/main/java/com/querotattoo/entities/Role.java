@@ -1,13 +1,15 @@
 package com.querotattoo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "tb_roles")
+@NoArgsConstructor
 public class Role implements GrantedAuthority {
     private static final long serialVersionUID = 1L;
 
@@ -19,9 +21,6 @@ public class Role implements GrantedAuthority {
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
-    public Role() {
-
-    }
 
     public Role(String nomeRole, List<User> users) {
         this.nomeRole = nomeRole;
