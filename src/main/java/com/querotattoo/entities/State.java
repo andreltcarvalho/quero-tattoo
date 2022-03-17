@@ -20,8 +20,9 @@ public class State {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+
     @Column(name = "name", unique = true)
+    @NotNull(message = "Nome do estado não pode ser nulo")
     private String name;
 
     @OneToMany

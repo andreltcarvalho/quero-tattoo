@@ -12,15 +12,15 @@ import java.io.Serializable;
 public class StudioAddress implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotNull
+    @NotNull(message = "O CEP não pode ser nulo")
     @Column(name = "address_cep")
     private String cep;
 
-    @NotNull
+    @NotNull(message = "O endereço não pode ser nulo!")
     @Column(name = "address_street")
     private String streetWithNumber;
 
-    @NotNull
+    @NotNull(message = "A cidade não pode ser Nula")
     @ManyToOne
     @JoinColumn(name = "address_city_id")
     private City city;

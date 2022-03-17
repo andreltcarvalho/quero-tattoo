@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Collection;
@@ -23,14 +24,18 @@ public class User implements Serializable, UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Nome não pode ser nulo")
+    @NotBlank(message = "Nome é obrigatório")
     private String name;
 
-    @NotNull
+    @NotNull(message = "Senha não pode ser nula")
+    @NotBlank(message = "Senha é obrigatória")
     private String password;
 
-    @NotNull
-        @Column(name = "phone", unique = true)
+
+    @NotBlank(message = "Telefone é obrigatório")
+    @Column(name = "phone", unique = true)
+    @NotNull(message = "Telefone não pode ser nulo")
     private String phone;
 
 
@@ -39,9 +44,9 @@ public class User implements Serializable, UserDetails {
     @Column(name = "verification_code", length = 64)
     private String verificationCode;
 
-    @NotNull
     @Email
     @Column(name = "email", unique = true)
+    @NotNull(message = "Email não pode ser nulo")
     private String email;
 
     @JsonIgnore
@@ -50,11 +55,11 @@ public class User implements Serializable, UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "nomeRole"))
     private List<Role> roles;
 
-    public User(){
+    public User() {
 
     }
 
-    public User(Long id, String name, String email,String password, String phone, String verificationCode,  List<Role> roles) {
+    public User(Long id, String name, String email, String password, String phone, String verificationCode, List<Role> roles) {
         this.id = id;
         this.name = name;
         this.password = password;

@@ -96,7 +96,6 @@ public class UserController {
         if (userService.findByTelefone(artistForm.getPhone()) != null) {
             throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
         }
-        artistForm.getAddresses().forEach(studioAddress -> studioAddress.setCity(cityService.findById(studioAddress.getCity().getId())));
         Artist artist = (Artist) userService.create(artistForm);
         mailSender.sendVerificationEmail(artistForm);
         return ResponseEntity.created(uri).body(artist);

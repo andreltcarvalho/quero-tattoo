@@ -7,10 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
@@ -40,7 +45,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
         body = new StandardErrorMessage(status.getReasonPhrase(), ex.getMessage());
         return super.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        List<ObjectError> erros = ex.getBindingResult().getAllErrors();
+        List<String> body = new ArrayList<>();
+        erros.forEach(objectError -> body.add(objectError.getDefaultMessage()));
+        StandardErrorMessage error = new StandardErrorMessage("Erro de Validação", body.toString());
+
+        return super.handleExceptionInternal(ex, error, headers, status, request);
     }
 }

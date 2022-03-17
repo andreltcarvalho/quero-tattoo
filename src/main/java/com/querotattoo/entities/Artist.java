@@ -23,13 +23,13 @@ import java.util.List;
 public class Artist extends User implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
 
-    @NotNull
+    @NotNull(message = "Os estilos de tatuagem não podem ser nulos")
     @NotEmpty
     @ElementCollection
     @Valid
     private List<String> tattooStyles;
 
-    @NotNull
+    @NotNull(message = "Os endereços não podem ser nulos")
     @Embedded
     @ElementCollection
     @Valid
