@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.RollbackException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,16 +38,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(StandardError.class)
-    public ResponseEntity<?> database(StandardError e, WebRequest request) {
+    public ResponseEntity<?> standardError(StandardError e, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return handleExceptionInternal(new IllegalStateException(e.getMessage()), e.getMessage(), new HttpHeaders(), status, request);
     }
 
 
+    @ExceptionHandler(RollbackException.class)
+    public ResponseEntity<?> ExceptionMapperStandardImpl(RollbackException e, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return handleExceptionInternal(e, new StandardErrorMessage(status.getReasonPhrase(), e.getCause().getMessage()), new HttpHeaders(), status, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-        body = new StandardErrorMessage(status.getReasonPhrase(), ex.getMessage());
+        if (body == null) {
+            body = new StandardErrorMessage(status.getReasonPhrase(), ex.getMessage());
+        }
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 

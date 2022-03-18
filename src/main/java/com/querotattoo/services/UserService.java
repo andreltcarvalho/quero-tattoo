@@ -34,11 +34,11 @@ public class UserService {
     }
 
     public User findById(Long id) {
-        if(id==null){
+        if (id == null) {
             throw new IllegalStateException("O id do usuario não pode ser nulo.");
         }
         Optional<User> object = userDAO.findById(id);
-        return object.orElseThrow(() -> new ResourceNotFoundException("Usuario nao encontrado com id: "+id));
+        return object.orElseThrow(() -> new ResourceNotFoundException("Usuario nao encontrado com id: " + id));
     }
 
     public List<User> saveAll(List<User> users) {

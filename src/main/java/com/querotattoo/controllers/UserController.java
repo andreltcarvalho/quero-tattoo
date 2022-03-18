@@ -1,5 +1,6 @@
 package com.querotattoo.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querotattoo.controllers.exceptions.StandardError;
 import com.querotattoo.entities.Artist;
 import com.querotattoo.entities.User;
@@ -12,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,8 +21,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController()
 @RequestMapping(value = "/users")
@@ -51,18 +54,6 @@ public class UserController {
     public ResponseEntity<User> findAll(@PathVariable(value = "id") Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok().body(user);
-    }
-
-    @ResponseBody
-    @PatchMapping("/{id}")
-    public void changePassword(@PathVariable(value = "id") Long id, User userForm) {
-
-        User user = userService.findById(id);
-        if (userService.checkValidPassword(user.getPassword(), user.getPassword())) {
-            user.setPassword(new BCryptPasswordEncoder().encode(userForm.getPassword()));
-            userService.update(user);
-            logger.info("Usuario " + user.getEmail() + " trocou de senha.");
-        }
     }
 
     @ResponseBody
@@ -99,6 +90,32 @@ public class UserController {
         Artist artist = (Artist) userService.create(artistForm);
         mailSender.sendVerificationEmail(artistForm);
         return ResponseEntity.created(uri).body(artist);
+    }
+
+    @ResponseBody
+    @PatchMapping("/artists/{id}")
+    public ResponseEntity<?> update(@PathVariable(value = "id") Long artistId, @RequestBody Map<String, Object> fieldsToUpdate) {
+        Artist artistToUpdate = (Artist) userService.findById(artistId);
+        if (artistToUpdate == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        merge(fieldsToUpdate, artistToUpdate);
+        return ResponseEntity.ok().body(userService.update(artistToUpdate));
+    }
+
+    private void merge(Map<String, Object> fieldsToUpdate, Artist artistToUpdate) {
+        ObjectMapper mapper = new ObjectMapper();
+        Artist newArtist = mapper.convertValue(fieldsToUpdate, Artist.class);
+
+        fieldsToUpdate.forEach((fieldName, fieldValue) -> {
+            Field field = ReflectionUtils.findField(Artist.class, fieldName);
+            field.setAccessible(true);
+
+            Object newValue = ReflectionUtils.getField(field, newArtist);
+
+            ReflectionUtils.setField(field, artistToUpdate, newValue);
+        });
     }
 
     @GetMapping("/verify")
