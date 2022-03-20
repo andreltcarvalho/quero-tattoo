@@ -14,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +48,6 @@ public class UserService {
         userForm.setPassword(new BCryptPasswordEncoder().encode(userForm.getPassword()));
         String randomCode = RandomString.make(64);
         userForm.setVerificationCode(randomCode);
-        userForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_USER")));
         logger.info("Novo usuario cadastrado: " + userForm.toString());
         return userDAO.save(userForm);
     }

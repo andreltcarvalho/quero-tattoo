@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,17 +24,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/")
                 .permitAll()
-                .antMatchers(HttpMethod.GET, "/postRegister")
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/about")
-                .permitAll()
                 .antMatchers(HttpMethod.GET, "/verify/**")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/home/**")
-                .permitAll()
-                .antMatchers(HttpMethod.GET, "/register/**")
-                .permitAll()
-                .antMatchers(HttpMethod.POST, "/register/**")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/forgotPassword/**")
                 .permitAll()
@@ -43,6 +34,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/profile/**")
                 .authenticated()
+                .antMatchers(HttpMethod.GET, "/admin/**")
+                .hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/admin/**")
                 .hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/users/**")
@@ -55,10 +48,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/css/**", "/images/**");
     }
 }

@@ -22,10 +22,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userService.findByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("Usuario não encontrado");
-
         } else {
             return user;
         }
     }
-
 }

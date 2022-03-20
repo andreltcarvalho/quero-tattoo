@@ -59,17 +59,6 @@ public class User implements Serializable, UserDetails {
 
     }
 
-    public User(Long id, String name, String email, String password, String phone, String verificationCode, List<Role> roles) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
-        this.phone = phone;
-        this.enabled = false;
-        this.verificationCode = verificationCode;
-        this.email = email;
-        this.roles = roles;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;

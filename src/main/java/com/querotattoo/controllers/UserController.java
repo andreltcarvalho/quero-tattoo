@@ -1,10 +1,16 @@
 package com.querotattoo.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querotattoo.controllers.exceptions.StandardError;
+import com.querotattoo.controllers.exceptions.StandardErrorMessage;
 import com.querotattoo.entities.Artist;
+import com.querotattoo.entities.Customer;
 import com.querotattoo.entities.User;
+import com.querotattoo.entities.dto.Mapper;
+import com.querotattoo.entities.dto.UserReadDTO;
 import com.querotattoo.services.CityService;
+import com.querotattoo.services.RoleService;
 import com.querotattoo.services.SenderMailService;
 import com.querotattoo.services.UserService;
 import org.slf4j.Logger;
@@ -23,8 +29,11 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 @RestController()
 @RequestMapping(value = "/users")
@@ -40,19 +49,29 @@ public class UserController {
     private CityService cityService;
 
     @Autowired
+    private RoleService roleService;
+
+    @Autowired
     private SenderMailService mailSender;
+
+    @Autowired
+    private Mapper mapper;
 
     @ResponseBody
     @GetMapping()
-    public ResponseEntity<List<User>> findAll() {
-        List<User> list = userService.findAll();
+    public ResponseEntity<List<UserReadDTO>> findAll() {
+        List<UserReadDTO> list = userService.findAll()
+                .stream()
+                .map(mapper::toDto)
+                .collect(toList());
+
         return ResponseEntity.ok().body(list);
     }
 
     @ResponseBody
     @GetMapping("/{id}")
-    public ResponseEntity<User> findAll(@PathVariable(value = "id") Long id) {
-        User user = userService.findById(id);
+    public ResponseEntity<UserReadDTO> findById(@PathVariable(value = "id") Long id) {
+        UserReadDTO user = mapper.toDto(userService.findById(id));
         return ResponseEntity.ok().body(user);
     }
 
@@ -63,64 +82,87 @@ public class UserController {
     }
 
     @ResponseBody
-    @PostMapping()
-    public ResponseEntity<User> registration(@RequestBody User userForm) throws MessagingException, UnsupportedEncodingException, StandardError {
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userForm.getId()).toUri();
-        if (userService.findByEmail(userForm.getEmail()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail");
-        }
-        if (userService.findByTelefone(userForm.getPhone()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
-        }
-        User user = userService.create(userForm);
-        mailSender.sendVerificationEmail(user);
-        return ResponseEntity.created(uri).body(user);
-    }
-
-    @ResponseBody
     @PostMapping("/artists")
     public ResponseEntity<User> artistRegistration(@RequestBody @Valid Artist artistForm) throws MessagingException, UnsupportedEncodingException, StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(artistForm.getId()).toUri();
-        if (userService.findByEmail(artistForm.getEmail()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail");
-        }
-        if (userService.findByTelefone(artistForm.getPhone()) != null) {
-            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
-        }
+        checkEmailAndPhoneToCreate(artistForm);
+        artistForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_ARTIST")));
         Artist artist = (Artist) userService.create(artistForm);
         mailSender.sendVerificationEmail(artistForm);
         return ResponseEntity.created(uri).body(artist);
     }
 
     @ResponseBody
+    @PostMapping("/customers")
+    public ResponseEntity<User> customerRegistration(@RequestBody @Valid Customer customerForm) throws MessagingException, UnsupportedEncodingException, StandardError {
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(customerForm.getId()).toUri();
+        checkEmailAndPhoneToCreate(customerForm);
+        customerForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_CUSTOMER")));
+        Customer artist = (Customer) userService.create(customerForm);
+        mailSender.sendVerificationEmail(customerForm);
+        return ResponseEntity.created(uri).body(artist);
+    }
+
+    @ResponseBody
     @PatchMapping("/artists/{id}")
-    public ResponseEntity<?> update(@PathVariable(value = "id") Long artistId, @RequestBody Map<String, Object> fieldsToUpdate) {
-        Artist artistToUpdate = (Artist) userService.findById(artistId);
+    public ResponseEntity<?> updateArtist(@PathVariable(value = "id") Long userId, @RequestBody Map<String, Object> fieldsToUpdate) {
+        Artist artistToUpdate = (Artist) userService.findById(userId);
         if (artistToUpdate == null) {
             return ResponseEntity.notFound().build();
         }
 
-        merge(fieldsToUpdate, artistToUpdate);
+        mergeUser(fieldsToUpdate, artistToUpdate);
         return ResponseEntity.ok().body(userService.update(artistToUpdate));
     }
 
-    private void merge(Map<String, Object> fieldsToUpdate, Artist artistToUpdate) {
-        ObjectMapper mapper = new ObjectMapper();
-        Artist newArtist = mapper.convertValue(fieldsToUpdate, Artist.class);
 
+    @ResponseBody
+    @PatchMapping("/customers/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable(value = "id") Long userId, @RequestBody Map<String, Object> fieldsToUpdate) {
+        Customer artistToUpdate = (Customer) userService.findById(userId);
+        if (artistToUpdate == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        mergeUser(fieldsToUpdate, artistToUpdate);
+        return ResponseEntity.ok().body(userService.update(artistToUpdate));
+    }
+
+    private void mergeUser(Map<String, Object> fieldsToUpdate, Object userToUpdate) {
+        ObjectMapper mapper = new ObjectMapper();
+        Object newUser = null;
+        if (userToUpdate instanceof Artist) {
+            newUser = mapper.convertValue(fieldsToUpdate, Artist.class);
+        }
+
+        if (userToUpdate instanceof Customer) {
+            newUser = mapper.convertValue(fieldsToUpdate, Customer.class);
+        }
+
+        Object finalNewUser = newUser;
         fieldsToUpdate.forEach((fieldName, fieldValue) -> {
             Field field = ReflectionUtils.findField(Artist.class, fieldName);
             field.setAccessible(true);
 
-            Object newValue = ReflectionUtils.getField(field, newArtist);
-
-            ReflectionUtils.setField(field, artistToUpdate, newValue);
+            Object newValue = ReflectionUtils.getField(field, finalNewUser);
+            ReflectionUtils.setField(field, userToUpdate, newValue);
         });
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@Param("code") String code) {
-        return userService.verify(code) ? ResponseEntity.ok().body("Usuário verificado com Sucesso!")
-                : ResponseEntity.status(500).body("Erro na verificação do usuário");
+    public ResponseEntity<?> verifyUser(@Param("code") String code) throws JsonProcessingException, StandardError {
+        if (userService.verify(code)) {
+            return ResponseEntity.ok().body(("Usuário verificado com Sucesso!"));
+        }
+        return ResponseEntity.status(500).body(new StandardErrorMessage("Erro na verificação do usuário.", "Tente novamente"));
+    }
+
+    public void checkEmailAndPhoneToCreate(User user) throws StandardError {
+        if (userService.findByEmail(user.getEmail()) != null) {
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este e-mail");
+        }
+        if (userService.findByTelefone(user.getPhone()) != null) {
+            throw new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Erro na criação do usuário", "Já existe um usuário com este telefone");
+        }
     }
 }
