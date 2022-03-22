@@ -16,6 +16,8 @@ import com.querotattoo.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +34,11 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-@RestController()
+@RestController
 @RequestMapping(value = "/users")
 @Validated
 public class UserController {
@@ -59,14 +62,26 @@ public class UserController {
 
     @ResponseBody
     @GetMapping()
-    public ResponseEntity<List<UserReadDTO>> findAll() {
-        List<UserReadDTO> list = userService.findAll()
+    public ResponseEntity<Page<UserReadDTO>> findAll(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        List<UserReadDTO> list = userService.findAll(page, size)
                 .stream()
                 .map(mapper::toDto)
                 .collect(toList());
 
-        return ResponseEntity.ok().body(list);
+        Page<UserReadDTO> userReadDtoPage = new PageImpl<>(list);
+        return ResponseEntity.ok().body(userReadDtoPage);
     }
+
+    @GetMapping("/search")
+    public Page<UserReadDTO> search(@RequestParam("searchTerm") String searchTerm,
+                                    @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                    @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+
+        List<UserReadDTO> userPage = userService.search(searchTerm, page, size).stream().map(mapper::toDto).collect(Collectors.toList());
+        return new PageImpl<>(userPage);
+    }
+
 
     @ResponseBody
     @GetMapping("/{id}")
@@ -86,7 +101,7 @@ public class UserController {
     public ResponseEntity<User> artistRegistration(@RequestBody @Valid Artist artistForm) throws MessagingException, UnsupportedEncodingException, StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(artistForm.getId()).toUri();
         checkEmailAndPhoneToCreate(artistForm);
-        artistForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_ARTIST")));
+        artistForm.setRoles(Arrays.asList(roleService.findByRoleName("ROLE_ARTIST")));
         Artist artist = (Artist) userService.create(artistForm);
         mailSender.sendVerificationEmail(artistForm);
         return ResponseEntity.created(uri).body(artist);
@@ -97,7 +112,7 @@ public class UserController {
     public ResponseEntity<User> customerRegistration(@RequestBody @Valid Customer customerForm) throws MessagingException, UnsupportedEncodingException, StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(customerForm.getId()).toUri();
         checkEmailAndPhoneToCreate(customerForm);
-        customerForm.setRoles(Arrays.asList(roleService.findByNomeRole("ROLE_CUSTOMER")));
+        customerForm.setRoles(Arrays.asList(roleService.findByRoleName("ROLE_CUSTOMER")));
         Customer artist = (Customer) userService.create(customerForm);
         mailSender.sendVerificationEmail(customerForm);
         return ResponseEntity.created(uri).body(artist);

@@ -37,7 +37,7 @@ public class ProdConfig implements CommandLineRunner {
         final Role r3 = new Role("ROLE_ARTIST", null);
 
 
-        if (roleService.findByNomeRole(r1.getNomeRole()) == null && roleService.findByNomeRole(r2.getNomeRole()) == null) {
+        if (roleService.findByRoleName(r1.getRoleName()) == null && roleService.findByRoleName(r2.getRoleName()) == null) {
             roleService.SaveAll(Arrays.asList(r1, r2, r3));
         }
 

@@ -52,7 +52,7 @@ public class User implements Serializable, UserDetails {
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "nomeRole"))
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "roleName"))
     private List<Role> roles;
 
     public User() {

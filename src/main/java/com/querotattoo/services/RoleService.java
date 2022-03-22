@@ -7,6 +7,9 @@ import com.querotattoo.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +24,8 @@ public class RoleService {
         return roleDAO.findAll();
     }
 
-    public Role findByNomeRole(String role) {
-        return roleDAO.findByNomeRole(role);
+    public Role findByRoleName(String role) {
+        return roleDAO.findByRoleName(role);
     }
 
     public void SaveAll(List<Role> roles) {
@@ -34,7 +37,7 @@ public class RoleService {
     }
 
     public Role merge(Role role) {
-        return roleDAO.findByNomeRole(role.getNomeRole());
+        return roleDAO.findByRoleName(role.getRoleName());
     }
 
     public void delete(Long id) {
@@ -47,21 +50,9 @@ public class RoleService {
 
         }
     }
-//
-//	public Role update(Long id, Role obj) {
-//		try {
-//			Csidade entity = roleDAO.getOne(id);
-//			updateData(entity, obj);
-//			return roleDAO.save(entity);
-//		} catch (EntityNotFoundException e) {
-//			throw new ResourceNotFoundException(id);
-//		}
-//	}
 
-//	private void updateData(Role entity, Role obj) {
-//		entity.setNome(obj.getName());
-//		entity.setEstado(obj.getEmail());
-//		entity.setPhone(obj.getPhone());
-//
-//	}
+    public Page<Role> search(String searchTerm, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "roleName");
+        return roleDAO.search(searchTerm.toLowerCase(), pageRequest);
+    }
 }

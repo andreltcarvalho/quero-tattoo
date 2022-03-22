@@ -15,29 +15,30 @@ public class Role implements GrantedAuthority {
 
     @Id
     @Column(unique = true)
-    private String nomeRole;
+    @JsonIgnore
+    private String roleName;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
 
-    public Role(String nomeRole, List<User> users) {
-        this.nomeRole = nomeRole;
+    public Role(String roleName, List<User> users) {
+        this.roleName = roleName;
         this.users = users;
     }
 
-    public String getNomeRole() {
-        return nomeRole;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setNomeRole(String nomeRole) {
-        this.nomeRole = nomeRole;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     @Override
     public String getAuthority() {
-        return this.nomeRole;
+        return this.roleName;
     }
 
     public List<User> getUsers() {

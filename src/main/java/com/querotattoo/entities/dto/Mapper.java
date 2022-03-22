@@ -16,7 +16,7 @@ public class Mapper {
         List<String> roles = user
                 .getRoles()
                 .stream()
-                .map(Role::getNomeRole)
+                .map(Role::getRoleName)
                 .collect(toList());
 
         return new UserReadDTO(user, roles);

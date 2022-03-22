@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +32,20 @@ public class UserService {
     @Autowired
     private RoleService roleService;
 
-    public List<User> findAll() {
-        return userDAO.findAll();
+    public Page<User> search(String searchTerm, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "name");
+
+        return userDAO.search(searchTerm.toLowerCase(), pageRequest);
     }
+
+    public Page<User> findAll(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "name");
+        return new PageImpl<User>(userDAO.findAll(), pageRequest, size);
+    }
+
+//    public List<User> findAll() {
+//        return userDAO.findAll();
+//    }
 
     public User findById(Long id) {
         if (id == null) {
