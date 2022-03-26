@@ -27,18 +27,16 @@ public class Schedule implements Serializable {
     @NotBlank(message = "Endereço não pode estar em branco")
     private String address;
 
-    @ManyToOne
-    @JoinColumn(name = "artist_id")
-    private Artist artist;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
-
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd'T'HH:mm")
-    private Instant date;
+    private Instant dateToLog;
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "yyyy-MM-dd'T'HH:mm")
     private Instant eventDate;
+
+    @NotNull
+    @OneToOne
+    private TattooEstimate tattooEstimate;
+
+    private String status;
 }

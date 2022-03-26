@@ -7,7 +7,7 @@ import com.querotattoo.controllers.exceptions.StandardErrorMessage;
 import com.querotattoo.entities.Artist;
 import com.querotattoo.entities.Customer;
 import com.querotattoo.entities.User;
-import com.querotattoo.entities.dto.Mapper;
+import com.querotattoo.entities.dto.DTOMapper;
 import com.querotattoo.entities.dto.UserReadDTO;
 import com.querotattoo.services.CityService;
 import com.querotattoo.services.RoleService;
@@ -58,7 +58,7 @@ public class UserController {
     private SenderMailService mailSender;
 
     @Autowired
-    private Mapper mapper;
+    private DTOMapper DTOMapper;
 
     @ResponseBody
     @GetMapping()
@@ -66,7 +66,7 @@ public class UserController {
                                                      @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         List<UserReadDTO> list = userService.findAll(page, size)
                 .stream()
-                .map(mapper::toDto)
+                .map(DTOMapper::toDto)
                 .collect(toList());
 
         Page<UserReadDTO> userReadDtoPage = new PageImpl<>(list);
@@ -78,7 +78,7 @@ public class UserController {
                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
 
-        List<UserReadDTO> userPage = userService.search(searchTerm, page, size).stream().map(mapper::toDto).collect(Collectors.toList());
+        List<UserReadDTO> userPage = userService.search(searchTerm, page, size).stream().map(DTOMapper::toDto).collect(Collectors.toList());
         return new PageImpl<>(userPage);
     }
 

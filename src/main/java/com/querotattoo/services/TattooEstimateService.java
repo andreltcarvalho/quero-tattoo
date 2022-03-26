@@ -1,7 +1,7 @@
 package com.querotattoo.services;
 
-import com.querotattoo.dao.ScheduleDAO;
-import com.querotattoo.entities.Schedule;
+import com.querotattoo.dao.TattooEstimateDAO;
+import com.querotattoo.entities.TattooEstimate;
 import com.querotattoo.exceptions.DatabaseException;
 import com.querotattoo.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -19,46 +19,51 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ScheduleService {
+public class TattooEstimateService {
 
-    private static Logger logger = LoggerFactory.getLogger(ScheduleService.class);
+    private static Logger logger = LoggerFactory.getLogger(TattooEstimateService.class);
 
     @Autowired
-    private ScheduleDAO scheduleDAO;
+    private TattooEstimateDAO tattooEstimateDAO;
 
     @Autowired
     private RoleService roleService;
 
 
-    public Page<Schedule> findAll(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "eventDate");
-        return new PageImpl<Schedule>(scheduleDAO.findAll(), pageRequest, size);
+    public Page<TattooEstimate> findAll(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "artist");
+        return new PageImpl<TattooEstimate>(tattooEstimateDAO.findAll(), pageRequest, size);
     }
 
-    public Schedule findById(Long id) {
+    public TattooEstimate findById(Long id) {
         if (id == null) {
             throw new IllegalStateException("O id do agendamento não pode ser nulo.");
         }
-        Optional<Schedule> object = scheduleDAO.findById(id);
+        Optional<TattooEstimate> object = tattooEstimateDAO.findById(id);
         return object.orElseThrow(() -> new ResourceNotFoundException("Agendamento nao encontrado com id: " + id));
     }
 
-    public List<Schedule> saveAll(List<Schedule> schedules) {
-        return scheduleDAO.saveAll(schedules);
+    public List<TattooEstimate> saveAll(List<TattooEstimate> estimates) {
+        return tattooEstimateDAO.saveAll(estimates);
     }
 
-    public Schedule create(Schedule schedule) {
-        return scheduleDAO.save(schedule);
+    public TattooEstimate save(TattooEstimate estimate) {
+        return tattooEstimateDAO.save(estimate);
     }
 
     public void delete(Long id) {
         try {
-            scheduleDAO.deleteById(id);
+            tattooEstimateDAO.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException(id);
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException(e.getMessage());
         }
+    }
+
+    public void merge(TattooEstimate tattooEstimate) {
+        TattooEstimate estimateToUpdate = tattooEstimateDAO.findById(tattooEstimate.getId()).get();
+        tattooEstimateDAO.saveAndFlush(estimateToUpdate);
     }
 }
 

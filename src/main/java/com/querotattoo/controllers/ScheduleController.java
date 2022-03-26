@@ -1,10 +1,9 @@
 package com.querotattoo.controllers;
 
-import com.querotattoo.controllers.exceptions.StandardError;
 import com.querotattoo.entities.Artist;
-import com.querotattoo.entities.Customer;
 import com.querotattoo.entities.Schedule;
 import com.querotattoo.services.ScheduleService;
+import com.querotattoo.services.TattooEstimateService;
 import com.querotattoo.services.UserService;
 import com.querotattoo.utils.DateUtils;
 import org.slf4j.Logger;
@@ -28,6 +27,8 @@ public class ScheduleController {
     private ScheduleService scheduleService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TattooEstimateService tattooEstimateService;
 
     @ResponseBody
     @GetMapping()
@@ -46,21 +47,16 @@ public class ScheduleController {
     }
 
     @ResponseBody
-    @PostMapping("/artistId/{artistId}/customerId/{customerId}")
-    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule, @PathVariable(value = "artistId") Long artistId, @PathVariable(value = "customerId") Long customerId) throws StandardError {
+    @PostMapping()
+    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule) {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(schedule.getId()).toUri();
 
-        schedule.setDate(DateUtils.getNow());
-
-        schedule.setArtist((Artist) userService.findById(artistId));
-        schedule.setCustomer((Customer) userService.findById(customerId));
-
-        validateArtistAndAddress(schedule.getArtist().getId(), schedule);
-
+        schedule.setDateToLog(DateUtils.getNow());
+        schedule.setStatus("Pedido em aberto, aguardando confirmação do tatuador.");
         return ResponseEntity.created(uri).body(scheduleService.create(schedule));
     }
 
-    private void validateArtistAndAddress(Long artistId, Schedule schedule) {
+    private void validateArtistAndSetAddress(Long artistId, Schedule schedule) {
         try {
             Artist artist = (Artist) userService.findById(artistId);
             schedule.setAddress(artist.getAddresses().stream().filter(studioAddress -> studioAddress.getCep().equals(schedule.getAddress())).findFirst().get().toString());
@@ -74,5 +70,4 @@ public class ScheduleController {
     public void delete(@PathVariable(value = "id") Long id) {
         scheduleService.delete(id);
     }
-
 }
