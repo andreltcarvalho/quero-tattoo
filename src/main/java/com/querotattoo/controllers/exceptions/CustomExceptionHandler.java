@@ -27,7 +27,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> resourceNotFound(ResourceNotFoundException e, WebRequest request) {
         String error = "Resource not found";
         HttpStatus status = HttpStatus.NOT_FOUND;
-        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), status, request);
+        StandardErrorMessage errorMessage = new StandardErrorMessage("Recurso não encontrado.", e.getMessage());
+        return handleExceptionInternal(e, errorMessage, new HttpHeaders(), status, request);
     }
 
     @ExceptionHandler(DatabaseException.class)

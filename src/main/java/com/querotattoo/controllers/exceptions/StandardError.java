@@ -1,8 +1,9 @@
 package com.querotattoo.controllers.exceptions;
 
+import com.querotattoo.utils.DateUtils;
+
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 public class StandardError extends Throwable implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -18,7 +19,7 @@ public class StandardError extends Throwable implements Serializable {
 
     public StandardError(Integer status, String error, String message) {
         super();
-        this.timestamp = Instant.now().minus(3, ChronoUnit.HOURS);
+        this.timestamp = DateUtils.getNow();
         this.status = status;
         this.error = error;
         this.message = message;

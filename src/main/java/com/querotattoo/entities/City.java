@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name = "cities")
+@Table(name = "tb_cities")
 @NoArgsConstructor
 @AllArgsConstructor
 public class City {

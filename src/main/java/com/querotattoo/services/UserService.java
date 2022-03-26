@@ -43,10 +43,6 @@ public class UserService {
         return new PageImpl<User>(userDAO.findAll(), pageRequest, size);
     }
 
-//    public List<User> findAll() {
-//        return userDAO.findAll();
-//    }
-
     public User findById(Long id) {
         if (id == null) {
             throw new IllegalStateException("O id do usuario não pode ser nulo.");

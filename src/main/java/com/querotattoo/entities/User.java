@@ -32,12 +32,10 @@ public class User implements Serializable, UserDetails {
     @NotBlank(message = "Senha é obrigatória")
     private String password;
 
-
     @NotBlank(message = "Telefone é obrigatório")
     @Column(name = "phone", unique = true)
     @NotNull(message = "Telefone não pode ser nulo")
     private String phone;
-
 
     private boolean enabled;
 
