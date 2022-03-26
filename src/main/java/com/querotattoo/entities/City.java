@@ -29,5 +29,10 @@ public class City {
     @JoinColumn(name = "state_id")
     private State state;
 
+    @Override
+    public String toString() {
+        return name + ", " + state;
+    }
+
 }
 

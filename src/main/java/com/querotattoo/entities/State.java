@@ -29,4 +29,9 @@ public class State {
     @JsonIgnore
     @JoinColumn(name = "state_id")
     private List<City> cidades;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

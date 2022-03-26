@@ -2,6 +2,7 @@ package com.querotattoo.controllers;
 
 import com.querotattoo.controllers.exceptions.StandardError;
 import com.querotattoo.entities.Artist;
+import com.querotattoo.entities.Customer;
 import com.querotattoo.entities.Schedule;
 import com.querotattoo.services.ScheduleService;
 import com.querotattoo.services.UserService;
@@ -45,21 +46,24 @@ public class ScheduleController {
     }
 
     @ResponseBody
-    @PostMapping
-    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule) throws StandardError {
+    @PostMapping("/artistId/{artistId}/customerId/{customerId}")
+    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule, @PathVariable(value = "artistId") Long artistId, @PathVariable(value = "customerId") Long customerId) throws StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(schedule.getId()).toUri();
 
         schedule.setDate(DateUtils.getNow());
 
-        validateArtist(schedule.getArtist().getId());
+        schedule.setArtist((Artist) userService.findById(artistId));
+        schedule.setCustomer((Customer) userService.findById(customerId));
 
-        Schedule scheduleCreated = scheduleService.create(schedule);
-        return ResponseEntity.created(uri).body(scheduleCreated);
+        validateArtistAndAddress(schedule.getArtist().getId(), schedule);
+
+        return ResponseEntity.created(uri).body(scheduleService.create(schedule));
     }
 
-    private void validateArtist(Long artistId) throws StandardError {
+    private void validateArtistAndAddress(Long artistId, Schedule schedule) {
         try {
             Artist artist = (Artist) userService.findById(artistId);
+            schedule.setAddress(artist.getAddresses().stream().filter(studioAddress -> studioAddress.getCep().equals(schedule.getAddress())).findFirst().get().toString());
         } catch (ClassCastException e) {
             throw new ClassCastException("Este usuário não é um Tatuador.");
         }

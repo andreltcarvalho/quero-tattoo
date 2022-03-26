@@ -31,4 +31,10 @@ public class StudioAddress implements Serializable {
     @NotNull(message = "O nome do estudio não pode ser nulo")
     @NotBlank
     private String name;
+
+
+    @Override
+    public String toString() {
+        return name + " - " + streetWithNumber + ", " + city.toString() + ", " + cep;
+    }
 }
