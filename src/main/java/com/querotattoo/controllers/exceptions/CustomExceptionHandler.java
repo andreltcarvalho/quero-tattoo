@@ -40,8 +40,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(StandardError.class)
     public ResponseEntity<?> standardError(StandardError e, WebRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        return handleExceptionInternal(new IllegalStateException(e.getMessage()), e.getMessage(), new HttpHeaders(), status, request);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        StandardErrorMessage body = new StandardErrorMessage("Erro Interno", e.getMessage());
+        return handleExceptionInternal(new IllegalStateException(e.getMessage()), body, new HttpHeaders(), status, request);
     }
 
 

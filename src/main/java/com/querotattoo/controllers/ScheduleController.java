@@ -1,7 +1,9 @@
 package com.querotattoo.controllers;
 
+import com.querotattoo.controllers.exceptions.StandardError;
 import com.querotattoo.entities.Artist;
 import com.querotattoo.entities.Schedule;
+import com.querotattoo.entities.TattooEstimate;
 import com.querotattoo.services.ScheduleService;
 import com.querotattoo.services.TattooEstimateService;
 import com.querotattoo.services.UserService;
@@ -16,6 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+
+import static com.querotattoo.Constants.*;
 
 @RestController
 @RequestMapping(value = "/schedules")
@@ -48,11 +52,14 @@ public class ScheduleController {
 
     @ResponseBody
     @PostMapping()
-    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule) {
+    public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule) throws StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(schedule.getId()).toUri();
-
+        TattooEstimate tattooEstimate = tattooEstimateService.findById(schedule.getTattooEstimate().getId());
+        if (!tattooEstimate.getStatus().equals(ORÇAMENTO_APROVADO)) {
+            throw new StandardError(500, "Erro no agendamento", "Não é possível agendar, pois o orçamento ainda não foi aprovado.");
+        }
         schedule.setDateToLog(DateUtils.getNow());
-        schedule.setStatus("Pedido em aberto, aguardando confirmação do tatuador.");
+        schedule.setStatus(AGENDAMENTO_CRIADO);
         return ResponseEntity.created(uri).body(scheduleService.create(schedule));
     }
 
@@ -69,5 +76,24 @@ public class ScheduleController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(value = "id") Long id) {
         scheduleService.delete(id);
+    }
+
+    @ResponseBody
+    @PostMapping("/approve/{id}")
+    public ResponseEntity<Schedule> approve(@PathVariable(value = "id") Long id) throws StandardError {
+
+        Schedule scheduleToApprove = scheduleService.findById(id);
+
+        if (scheduleToApprove == null || scheduleToApprove.getStatus() == null) {
+            throw new StandardError(500, "Erro na aprovação de agendamento", "Agendamento não encontrado");
+        }
+        if (scheduleToApprove.getStatus().equals(AGENDAMENTO_APROVADO)) {
+            throw new StandardError(500, "Erro na aprovação de agendamento", "Este agendamento já foi aprovado");
+        }
+        if (scheduleToApprove.getStatus().equals(AGENDAMENTO_CRIADO)) {
+            scheduleToApprove.setStatus(AGENDAMENTO_APROVADO);
+            scheduleService.merge(scheduleToApprove);
+        }
+        return ResponseEntity.ok().body(scheduleToApprove);
     }
 }

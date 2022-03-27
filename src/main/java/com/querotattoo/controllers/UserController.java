@@ -121,11 +121,9 @@ public class UserController {
     @PatchMapping("/artists/{id}")
     public ResponseEntity<?> updateArtist(@PathVariable(value = "id") Long userId, @RequestBody Map<String, Object> fieldsToUpdate) {
         Artist artistToUpdate = (Artist) userService.findById(userId);
-        if (artistToUpdate == null) {
-            return ResponseEntity.notFound().build();
-        }
 
         mergeUser(fieldsToUpdate, artistToUpdate);
+
         return ResponseEntity.ok().body(userService.update(artistToUpdate));
     }
 

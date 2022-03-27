@@ -60,5 +60,10 @@ public class ScheduleService {
             throw new DatabaseException(e.getMessage());
         }
     }
+
+    public void merge(Schedule schedule) {
+        Schedule scheduleToUpdate = scheduleDAO.findById(schedule.getId()).get();
+        scheduleDAO.saveAndFlush(scheduleToUpdate);
+    }
 }
 

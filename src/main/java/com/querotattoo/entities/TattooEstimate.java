@@ -56,4 +56,6 @@ public class TattooEstimate {
 
     private String status;
 
+    private String artistObservations;
+
 }
