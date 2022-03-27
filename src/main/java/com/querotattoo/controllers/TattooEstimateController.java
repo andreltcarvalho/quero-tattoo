@@ -46,15 +46,16 @@ public class TattooEstimateController {
     public ResponseEntity<TattooEstimateReadDTO> approve(@PathVariable(value = "id") Long id, @RequestBody Map<String, Object> fieldsToUpdate) throws StandardError {
         TattooEstimate estimateToApprove = tattooEstimateService.findById(id);
         if (estimateToApprove == null || estimateToApprove.getStatus() == null) {
-            throw new StandardError(500, "Erro na aprovação de orçamento", "Orçamento Não encontrado");
+            throw new StandardError(500, "Erro na aprovação de orçamento", "Orçamento Não encontrado, ID-ORÇAMENTO: " + estimateToApprove.getId());
         }
         if (estimateToApprove.getStatus().equals(ORÇAMENTO_APROVADO)) {
-            throw new StandardError(500, "Erro na aprovação de orçamento", "Este orçamento já foi aprovado");
+            throw new StandardError(500, "Erro na aprovação de orçamento", "Este orçamento já foi aprovado, ID-ORÇAMENTO: " + estimateToApprove.getId());
         }
         if (estimateToApprove.getStatus().equals(ORÇAMENTO_CRIADO)) {
             estimateToApprove.setStatus(ORÇAMENTO_APROVADO);
             mergeTattooEstimate(estimateToApprove, fieldsToUpdate);
             tattooEstimateService.merge(estimateToApprove);
+            logger.info("Orçamento aprovado." + " ID-Cliente: " + estimateToApprove.getCustomer().getId() + ". ID-Artista: " + estimateToApprove.getArtist().getId());
         }
         return ResponseEntity.ok().body(mapper.toDto(estimateToApprove));
 
@@ -101,9 +102,10 @@ public class TattooEstimateController {
             estimate.setArtist((Artist) userService.findById(estimate.getArtist().getId()));
             estimate.setCustomer((Customer) userService.findById(estimate.getCustomer().getId()));
             estimate.setStatus(ORÇAMENTO_CRIADO);
+            logger.info("Orçamento criado." + " ID-Cliente: " + estimate.getCustomer().getId() + ". ID-Artista: " + estimate.getArtist().getId());
             return ResponseEntity.created(uri).body(tattooEstimateService.save(estimate));
         } catch (ClassCastException e) {
-            throw new ClassCastException("Este usuário não é um Tatuador.");
+            throw new ClassCastException("Tatuador inválido: o usuário informado não é um Tatuador. ID-USUARIO: " + estimate.getArtist().getId());
         }
     }
 
@@ -116,6 +118,7 @@ public class TattooEstimateController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(value = "id") Long id) {
         tattooEstimateService.delete(id);
+        logger.info("Orçamento deletado com o id: " + id);
     }
 
 }

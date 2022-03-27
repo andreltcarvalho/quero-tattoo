@@ -48,7 +48,7 @@ public class ScheduleService {
         return scheduleDAO.saveAll(schedules);
     }
 
-    public Schedule create(Schedule schedule) {
+    public Schedule save(Schedule schedule) {
         return scheduleDAO.save(schedule);
     }
 

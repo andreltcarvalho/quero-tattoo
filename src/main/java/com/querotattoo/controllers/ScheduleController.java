@@ -29,8 +29,10 @@ public class ScheduleController {
 
     @Autowired
     private ScheduleService scheduleService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private TattooEstimateService tattooEstimateService;
 
@@ -59,16 +61,17 @@ public class ScheduleController {
         if (!tattooEstimate.getStatus().equals(ORÇAMENTO_APROVADO)) {
             throw new StandardError(500, "Erro no agendamento", "Não é possível agendar, pois o orçamento ainda não foi aprovado.");
         }
-        Schedule scheduleToCompareDate = scheduleService.findByEventDate(schedule.getEventDate());
-        checkIfDateIsAvailableToSchedule(scheduleToCompareDate, schedule);
+        checkIfDateIsAvailableToSchedule(schedule);
         schedule.setDateToLog(DateUtils.getNow());
         schedule.setStatus(AGENDAMENTO_CRIADO);
-        return ResponseEntity.created(uri).body(scheduleService.create(schedule));
+        logger.info("Agendamento criado para o dia: " + schedule.getEventDate() + ". ID-Cliente: " + tattooEstimate.getCustomer().getId() + ". ID-Artista: " + tattooEstimate.getArtist().getId());
+        return ResponseEntity.created(uri).body(scheduleService.save(schedule));
     }
 
-    private void checkIfDateIsAvailableToSchedule(Schedule scheduleToCompareDate, Schedule schedule) throws StandardError {
+    private void checkIfDateIsAvailableToSchedule(Schedule schedule) throws StandardError {
+        Schedule scheduleToCompareDate = scheduleService.findByEventDate(schedule.getEventDate());
         if (scheduleToCompareDate.getEventDate() != null && scheduleToCompareDate.getEventDate().compareTo(schedule.getEventDate()) == 0) {
-            throw new StandardError(500, "Erro no agendamento", "Esta data não está disponível, escolha outra Data");
+            throw new StandardError(500, "Erro no agendamento", "O horário" + scheduleToCompareDate.getEventDate() + " não está disponível, escolha outro horário");
         }
     }
 
@@ -85,6 +88,7 @@ public class ScheduleController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(value = "id") Long id) {
         scheduleService.delete(id);
+        logger.info("Agendamento deletado com o id: " + id);
     }
 
     @ResponseBody
@@ -102,7 +106,9 @@ public class ScheduleController {
         if (scheduleToApprove.getStatus().equals(AGENDAMENTO_CRIADO)) {
             scheduleToApprove.setStatus(AGENDAMENTO_APROVADO);
             scheduleService.merge(scheduleToApprove);
+            logger.info("Agendamento aprovado para o dia: " + scheduleToApprove.getEventDate() + ". ID-Cliente: " + scheduleToApprove.getTattooEstimate().getCustomer().getId() + ". ID-Artista: " + scheduleToApprove.getTattooEstimate().getArtist().getId());
         }
+
         return ResponseEntity.ok().body(scheduleToApprove);
     }
 }

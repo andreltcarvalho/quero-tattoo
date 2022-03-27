@@ -57,6 +57,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         if (body == null) {
             body = new StandardErrorMessage(status.getReasonPhrase(), ex.getMessage());
         }
+        logger.error("ERROR IN THE APPLICATION: " + ex.getMessage());
         return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 
