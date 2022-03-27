@@ -22,7 +22,7 @@ public class StateService {
         return stateDAO.findAll();
     }
 
-    public State findByNomeState(String state) {
+    public State findByStateName(String state) {
         return stateDAO.findByName(state);
     }
 

@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,12 @@ public class ScheduleService {
     public void merge(Schedule schedule) {
         Schedule scheduleToUpdate = scheduleDAO.findById(schedule.getId()).get();
         scheduleDAO.saveAndFlush(scheduleToUpdate);
+    }
+
+
+    public Schedule findByEventDate(Instant eventDate) {
+        Optional<Schedule> schedule = scheduleDAO.findByEventDate(eventDate);
+        return schedule.orElse(new Schedule());
     }
 }
 

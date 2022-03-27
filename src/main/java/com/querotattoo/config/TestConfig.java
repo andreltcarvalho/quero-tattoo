@@ -41,14 +41,20 @@ public class TestConfig implements CommandLineRunner {
             roleService.SaveAll(Arrays.asList(r1, r2, r3));
         }
 
+
         State state1 = new State(null, "São Paulo", null);
         State state2 = new State(null, "Minas Gerais", null);
 
-        stateService.SaveAll(Arrays.asList(state1, state2));
+        if (stateService.findByStateName(state1.getName()) == null && stateService.findByStateName(state2.getName()) == null) {
+            stateService.SaveAll(Arrays.asList(state1, state2));
+        }
+
 
         City city1 = new City(null, "Campinas", state1);
         City city2 = new City(null, "Belo Horizonte", state2);
 
-        cityService.SaveAll(Arrays.asList(city1, city2));
+        if (cityService.findByNomeCity(city1.getName()) == null && cityService.findByNomeCity(city2.getName()) == null) {
+            cityService.SaveAll(Arrays.asList(city1, city2));
+        }
     }
 }

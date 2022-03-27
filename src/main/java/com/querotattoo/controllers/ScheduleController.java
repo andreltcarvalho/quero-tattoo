@@ -55,12 +55,21 @@ public class ScheduleController {
     public ResponseEntity<Schedule> create(@RequestBody @Valid Schedule schedule) throws StandardError {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(schedule.getId()).toUri();
         TattooEstimate tattooEstimate = tattooEstimateService.findById(schedule.getTattooEstimate().getId());
+
         if (!tattooEstimate.getStatus().equals(ORÇAMENTO_APROVADO)) {
             throw new StandardError(500, "Erro no agendamento", "Não é possível agendar, pois o orçamento ainda não foi aprovado.");
         }
+        Schedule scheduleToCompareDate = scheduleService.findByEventDate(schedule.getEventDate());
+        checkIfDateIsAvailableToSchedule(scheduleToCompareDate, schedule);
         schedule.setDateToLog(DateUtils.getNow());
         schedule.setStatus(AGENDAMENTO_CRIADO);
         return ResponseEntity.created(uri).body(scheduleService.create(schedule));
+    }
+
+    private void checkIfDateIsAvailableToSchedule(Schedule scheduleToCompareDate, Schedule schedule) throws StandardError {
+        if (scheduleToCompareDate.getEventDate() != null && scheduleToCompareDate.getEventDate().compareTo(schedule.getEventDate()) == 0) {
+            throw new StandardError(500, "Erro no agendamento", "Esta data não está disponível, escolha outra Data");
+        }
     }
 
     private void validateArtistAndSetAddress(Long artistId, Schedule schedule) {
@@ -79,7 +88,7 @@ public class ScheduleController {
     }
 
     @ResponseBody
-    @PostMapping("/approve/{id}")
+    @PatchMapping("/approve/{id}")
     public ResponseEntity<Schedule> approve(@PathVariable(value = "id") Long id) throws StandardError {
 
         Schedule scheduleToApprove = scheduleService.findById(id);
