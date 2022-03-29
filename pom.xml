@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 		http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.template</groupId>
-    <artifactId>TattooProject</artifactId>
+    <groupId>com.querotattoo</groupId>
+    <artifactId>QueroTattoo</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -64,6 +64,11 @@
             <artifactId>lombok</artifactId>
             <version>1.18.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.16.0</version>
         </dependency>
     </dependencies>
 

@@ -71,7 +71,7 @@ public class ScheduleController {
     private void checkIfDateIsAvailableToSchedule(Schedule schedule) throws StandardError {
         Schedule scheduleToCompareDate = scheduleService.findByEventDate(schedule.getEventDate());
         if (scheduleToCompareDate.getEventDate() != null && scheduleToCompareDate.getEventDate().compareTo(schedule.getEventDate()) == 0) {
-            throw new StandardError(500, "Erro no agendamento", "O horário" + scheduleToCompareDate.getEventDate() + " não está disponível, escolha outro horário");
+            throw new StandardError(500, "Erro no agendamento", "O horário " + scheduleToCompareDate.getEventDate() + " não está disponível, escolha outro horário");
         }
     }
 
